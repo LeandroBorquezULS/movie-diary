@@ -1,28 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Movie Recommender</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Diary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Buscar Película</h1>
+    <div id="authView" class="screen auth-screen">
+        <section class="auth-card">
+            <p class="eyebrow">Movie Diary</p>
+            <h1 id="authTitle">Iniciar sesión</h1>
+            <p class="auth-copy">Accede con usuario y contraseña. Las contraseñas se almacenan en hash y nunca en texto plano.</p>
 
-    <input type="text" id="searchInput" placeholder="Ej: Batman">
-    <button onclick="searchMovie()">Buscar</button>
+            <form id="authForm" class="auth-form">
+                <label for="authUsername">Usuario</label>
+                <input id="authUsername" type="text" autocomplete="username" required>
 
-    <h2>Resultados</h2>
-    <ul id="results"></ul>
+                <label for="authPassword">Contraseña</label>
+                <div class="password-row">
+                    <input id="authPassword" type="password" autocomplete="current-password" required>
+                    <button id="toggleAuthPassword" class="ghost-button small-button" type="button">Mostrar</button>
+                </div>
 
-    <hr>
+                <div id="registerGenresWrapper" class="hidden">
+                    <p class="field-label">Géneros favoritos iniciales</p>
+                    <div id="authGenreOptions" class="genre-options"></div>
+                    <button id="authGenresToggle" class="link-button left hidden" type="button">Mostrar más</button>
+                </div>
 
-    <h2>Detalles</h2>
-    <div id="details"></div>
+                <button type="submit" id="authSubmitButton">Entrar</button>
+            </form>
 
-    <hr>
+            <button id="toggleAuthMode" class="link-button" type="button">Crear cuenta</button>
+            <p id="authMessage" class="status-message"></p>
+        </section>
+    </div>
 
-    <h2>Recomendaciones</h2>
-    <ul id="recommendations"></ul>
+    <div id="appView" class="screen hidden">
+        <header class="topbar">
+            <button id="homeButton" class="brand" type="button">Movie Diary</button>
 
-    <button onclick="goBack()">Volver</button>
+            <form id="searchForm" class="searchbar">
+                <input id="searchInput" type="text" placeholder="Buscar película">
+            </form>
+
+            <div class="topbar-actions">
+                <button id="historyButton" class="ghost-button nav-button" type="button">Usuario</button>
+                <button id="settingsButton" class="icon-button" type="button" aria-label="Configuración">&#9881;</button>
+            </div>
+        </header>
+
+        <main class="layout">
+            <section id="homePanel" class="content-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Inicio</p>
+                        <h2 id="mainTitle">Recomendadas para ti</h2>
+                    </div>
+                    <p id="mainSubtitle" class="section-copy">Ordenadas localmente usando señales de comunidad y afinidad personal.</p>
+                </div>
+                <div id="algorithmBadge" class="algorithm-badge"></div>
+                <div id="mainGrid" class="movie-grid"></div>
+            </section>
+
+            <section id="detailPanel" class="content-panel hidden">
+                <div class="panel-header detail-header">
+                    <div>
+                        <p class="eyebrow">Película</p>
+                        <h2 id="detailTitle">Detalle</h2>
+                    </div>
+                    <button id="backToHomeButton" class="ghost-button" type="button">Volver</button>
+                </div>
+                <div id="detailContent"></div>
+                <div class="related-section">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">Relacionadas</p>
+                            <h3>Más películas similares</h3>
+                        </div>
+                    </div>
+                    <div id="relatedGrid" class="movie-grid"></div>
+                </div>
+            </section>
+
+            <section id="historyPanel" class="content-panel hidden">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Diario</p>
+                        <h2>Historial de usuario</h2>
+                    </div>
+                    <div class="title-side">
+                        <span id="activeUsername" class="username-pill"></span>
+                        <button id="historyBackButton" class="ghost-button" type="button">Volver</button>
+                    </div>
+                </div>
+                <div id="historyTimeline" class="timeline"></div>
+            </section>
+
+            <section id="settingsPanel" class="content-panel hidden">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Configuración</p>
+                        <h2>Cuenta y gustos</h2>
+                    </div>
+                    <button id="closeSettingsButton" class="ghost-button" type="button">Volver</button>
+                </div>
+
+                <form id="accountForm" class="settings-form">
+                    <label for="settingsUsername">Nuevo usuario</label>
+                    <input id="settingsUsername" type="text" autocomplete="username">
+
+                    <label for="settingsCurrentPassword">Contraseña actual</label>
+                    <div class="password-row">
+                        <input id="settingsCurrentPassword" type="password" autocomplete="current-password">
+                        <button id="toggleSettingsCurrentPassword" class="ghost-button small-button" type="button">Mostrar</button>
+                    </div>
+
+                    <label for="settingsNewPassword">Nueva contraseña</label>
+                    <div class="password-row">
+                        <input id="settingsNewPassword" type="password" autocomplete="new-password">
+                        <button id="toggleSettingsNewPassword" class="ghost-button small-button" type="button">Mostrar</button>
+                    </div>
+
+                    <button type="submit">Guardar credenciales</button>
+                </form>
+
+                <section class="settings-block">
+                    <div class="panel-header compact">
+                        <div>
+                            <p class="eyebrow">Preferencias</p>
+                            <h3>Géneros favoritos</h3>
+                        </div>
+                    </div>
+                    <div id="settingsGenreOptions" class="genre-options"></div>
+                    <button id="settingsGenresToggle" class="link-button left hidden" type="button">Mostrar más</button>
+                    <button id="saveGenresButton" class="ghost-button" type="button">Guardar gustos</button>
+                </section>
+
+                <section class="settings-block danger-block">
+                    <div class="panel-header compact">
+                        <div>
+                            <p class="eyebrow">Cuenta</p>
+                            <h3>Eliminar cuenta</h3>
+                        </div>
+                    </div>
+                    <label for="deletePassword">Confirma tu contraseña</label>
+                    <div class="password-row">
+                        <input id="deletePassword" type="password">
+                        <button id="toggleDeletePassword" class="ghost-button small-button" type="button">Mostrar</button>
+                    </div>
+                    <button id="deleteAccountButton" class="danger-button" type="button">Borrar cuenta</button>
+                    <button id="logoutButton" class="link-button left" type="button">Cerrar sesión</button>
+                </section>
+
+                <p id="settingsMessage" class="status-message"></p>
+            </section>
+        </main>
+    </div>
+
+    <template id="movieCardTemplate">
+        <article class="movie-card">
+            <img class="movie-poster" alt="">
+            <div class="movie-body">
+                <div class="movie-heading">
+                    <h3></h3>
+                    <span class="movie-year"></span>
+                </div>
+                <p class="movie-reason"></p>
+                <p class="movie-stats"></p>
+                <p class="movie-overview"></p>
+            </div>
+        </article>
+    </template>
 
     <script src="app.js"></script>
 </body>
